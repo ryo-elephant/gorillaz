@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'file:///C:/Users/ryozo/AndroidStudioProjects/gorillaz/lib/signup/sign_up.dart';
+import 'package:gorillaz/presentation/sign_up/sign_up.dart';
+
 
 import '../home/home.dart';
 

@@ -12,4 +12,9 @@ class HomeModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future deleteMenus(Menu menu) async {
+    FirebaseFirestore.instance.collection('menus').doc(menu.documentId).delete();
+    notifyListeners();
+  }
+
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gorillaz/domain/menu.dart';
 import 'package:gorillaz/presentation/add_menu/add_menu.dart';
 import 'package:provider/provider.dart';
 
@@ -30,7 +31,8 @@ class Home extends StatelessWidget {
         body: Consumer<HomeModel>(
           builder: (context, model, child){
             final menus = model.menus;
-            final listTiles = menus.map(
+            final listTiles = menus
+                .map(
                   (menu) => ListTile(
                     title: Text(menu.menu),
                     trailing: IconButton(
@@ -46,6 +48,29 @@ class Home extends StatelessWidget {
                         model.fetchMenus();
                       },
                     ),
+                    onLongPress: () async {
+                      await showDialog(
+                        context: context,
+                        builder: (BuildContext context){
+                          return AlertDialog(
+                            title: Text('${menu.menu}を削除しますか？'),
+                            actions: [
+                              RaisedButton(
+                                child: const Text('OK'),
+                                color: Colors.white,
+                                shape: const OutlineInputBorder(
+                                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                                ),
+                                onPressed: () async {
+                                  Navigator.of(context).pop();
+                                  await deleteMenu(context, model, menu);
+                                },
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    },
             ),
             ).toList();
             return ListView(children: listTiles,
@@ -71,5 +96,54 @@ class Home extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Future deleteMenu(BuildContext context, HomeModel model, Menu menu) async {
+    try {
+      await model.deleteMenus(menu);
+      await showDialog(
+        context: context,
+        builder: (BuildContext context){
+          return AlertDialog(
+            title: Text('削除しました。'),
+            actions: [
+              RaisedButton(
+                child: const Text('OK'),
+                color: Colors.white,
+                shape: const OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                ),
+                onPressed: () async {
+                  Navigator.of(context).pop();
+                  await model.fetchMenus();
+                },
+              ),
+            ],
+          );
+        },
+      );
+      Navigator.of(context).pop();
+    } catch(e) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context){
+          return AlertDialog(
+            title: Text(e.toString()),
+            actions: [
+              RaisedButton(
+                child: const Text('OK'),
+                color: Colors.white,
+                shape: const OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                ),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }
   }
 }
